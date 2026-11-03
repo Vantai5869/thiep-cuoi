@@ -12,10 +12,36 @@ function escapeHtml(str) {
   }[c]));
 }
 
+function formatTime(date) {
+  return new Date(date).toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 module.exports = async function handler(req, res) {
+  await sql`
+    CREATE TABLE IF NOT EXISTS visits (
+      id TEXT PRIMARY KEY,
+      ip TEXT NOT NULL,
+      location TEXT,
+      user_agent TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+
   const wishes = await sql`
     SELECT name, message, ip, user_agent AS "userAgent", location, created_at AS "createdAt"
     FROM wishes
+    ORDER BY created_at DESC
+  `;
+
+  const visits = await sql`
+    SELECT ip, location, user_agent AS "userAgent", created_at AS "createdAt"
+    FROM visits
     ORDER BY created_at DESC
   `;
 
@@ -23,12 +49,24 @@ module.exports = async function handler(req, res) {
     .map(
       (w) => `
     <tr>
-      <td>${escapeHtml(w.createdAt)}</td>
+      <td>${escapeHtml(formatTime(w.createdAt))}</td>
       <td>${escapeHtml(w.name)}</td>
       <td>${escapeHtml(w.message)}</td>
       <td>${escapeHtml(w.ip)}</td>
       <td>${escapeHtml(w.location || '')}</td>
       <td>${escapeHtml(w.userAgent)}</td>
+    </tr>`
+    )
+    .join('');
+
+  const visitRows = visits
+    .map(
+      (v) => `
+    <tr>
+      <td>${escapeHtml(formatTime(v.createdAt))}</td>
+      <td>${escapeHtml(v.ip)}</td>
+      <td>${escapeHtml(v.location || '')}</td>
+      <td>${escapeHtml(v.userAgent)}</td>
     </tr>`
     )
     .join('');
@@ -51,6 +89,12 @@ module.exports = async function handler(req, res) {
 <table>
   <thead><tr><th>Thời gian</th><th>Tên</th><th>Lời chúc</th><th>IP</th><th>Vị trí</th><th>User Agent</th></tr></thead>
   <tbody>${rows}</tbody>
+</table>
+
+<h2>Lượt truy cập (${visits.length})</h2>
+<table>
+  <thead><tr><th>Thời gian</th><th>IP</th><th>Vị trí</th><th>User Agent</th></tr></thead>
+  <tbody>${visitRows}</tbody>
 </table>
 </body>
 </html>`;

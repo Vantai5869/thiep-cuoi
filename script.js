@@ -1,3 +1,6 @@
+// ====== Ghi nhận lượt truy cập ======
+fetch('/api/visits', { method: 'POST' }).catch(() => {});
+
 // ====== Hiệu ứng cánh hoa rơi (canvas) ======
 (function initPetals() {
   const canvas = document.getElementById('petal-canvas');
