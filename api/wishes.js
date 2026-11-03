@@ -28,12 +28,12 @@ async function lookupLocation(ip) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`https://ipapi.co/${ip}/json/`, { signal: controller.signal });
+    const res = await fetch(`http://ip-api.com/json/${ip}`, { signal: controller.signal });
     clearTimeout(timeout);
     if (!res.ok) return null;
     const data = await res.json();
-    if (data.error) return null;
-    return [data.city, data.region, data.country_name].filter(Boolean).join(', ') || null;
+    if (data.status !== 'success') return null;
+    return [data.city, data.regionName, data.country].filter(Boolean).join(', ') || null;
   } catch (err) {
     return null;
   }
