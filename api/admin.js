@@ -14,7 +14,7 @@ function escapeHtml(str) {
 
 module.exports = async function handler(req, res) {
   const wishes = await sql`
-    SELECT name, message, ip, user_agent AS "userAgent", created_at AS "createdAt"
+    SELECT name, message, ip, user_agent AS "userAgent", location, created_at AS "createdAt"
     FROM wishes
     ORDER BY created_at DESC
   `;
@@ -27,6 +27,7 @@ module.exports = async function handler(req, res) {
       <td>${escapeHtml(w.name)}</td>
       <td>${escapeHtml(w.message)}</td>
       <td>${escapeHtml(w.ip)}</td>
+      <td>${escapeHtml(w.location || '')}</td>
       <td>${escapeHtml(w.userAgent)}</td>
     </tr>`
     )
@@ -48,7 +49,7 @@ module.exports = async function handler(req, res) {
 <body>
 <h2>Danh sách lời chúc (${wishes.length})</h2>
 <table>
-  <thead><tr><th>Thời gian</th><th>Tên</th><th>Lời chúc</th><th>IP</th><th>User Agent</th></tr></thead>
+  <thead><tr><th>Thời gian</th><th>Tên</th><th>Lời chúc</th><th>IP</th><th>Vị trí</th><th>User Agent</th></tr></thead>
   <tbody>${rows}</tbody>
 </table>
 </body>

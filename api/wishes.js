@@ -11,15 +11,32 @@ async function ensureTable() {
       message TEXT NOT NULL,
       ip TEXT NOT NULL,
       user_agent TEXT,
+      location TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  await sql`ALTER TABLE wishes ADD COLUMN IF NOT EXISTS location TEXT`;
 }
 
 function getClientIp(req) {
   const xff = req.headers['x-forwarded-for'];
   if (xff) return xff.split(',')[0].trim();
   return req.socket?.remoteAddress || 'unknown';
+}
+
+async function lookupLocation(ip) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    const res = await fetch(`https://ipapi.co/${ip}/json/`, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.error) return null;
+    return [data.city, data.region, data.country_name].filter(Boolean).join(', ') || null;
+  } catch (err) {
+    return null;
+  }
 }
 
 module.exports = async function handler(req, res) {
@@ -57,10 +74,11 @@ module.exports = async function handler(req, res) {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const trimmedName = name.trim();
     const trimmedMessage = message.trim();
+    const location = await lookupLocation(ip);
 
     const [wish] = await sql`
-      INSERT INTO wishes (id, name, message, ip, user_agent)
-      VALUES (${id}, ${trimmedName}, ${trimmedMessage}, ${ip}, ${userAgent})
+      INSERT INTO wishes (id, name, message, ip, user_agent, location)
+      VALUES (${id}, ${trimmedName}, ${trimmedMessage}, ${ip}, ${userAgent}, ${location})
       RETURNING name, message, created_at AS "createdAt"
     `;
 
