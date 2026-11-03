@@ -1,0 +1,11 @@
+{
+  "name": "thiep-cuoi",
+  "version": "1.0.0",
+  "description": "Thiep cuoi online + API gui loi chuc (chong spam theo IP)",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  }
+}

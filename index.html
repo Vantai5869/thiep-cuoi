@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thiệp Cưới Văn Tài &amp; Thu Hương</title>
+
+  <!-- ===== Open Graph / Zalo / Facebook / Messenger preview khi share link ===== -->
+  <!-- Lưu ý: khi deploy lên domain thật, đổi og:url và og:image thành URL TUYỆT ĐỐI
+       (vd https://ten-mien-cua-ban.com/og-image.png) thì các app chat/MXH mới hiển thị đúng ảnh. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="💍 Thiệp cưới Văn Tài & Thu Hương" />
+  <meta property="og:description" content="Trân trọng kính mời bạn đến chung vui trong ngày cưới của Văn Tài & Thu Hương — Chủ Nhật, 20.12.2026." />
+  <meta property="og:image" content="og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="" />
+  <meta property="og:locale" content="vi_VN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="💍 Thiệp cưới Văn Tài & Thu Hương" />
+  <meta name="twitter:description" content="Trân trọng kính mời bạn đến chung vui trong ngày cưới của Văn Tài & Thu Hương." />
+  <meta name="twitter:image" content="og-image.png" />
+  <meta name="description" content="Thiệp mời cưới Văn Tài & Thu Hương - Chủ Nhật, 20.12.2026" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,500&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="petal-canvas" aria-hidden="true"></canvas>
+
+  <main class="card">
+
+    <section class="hero reveal">
+      <div class="icon-row">
+        <span class="icon">🤵</span>
+        <span class="icon icon-ring">💍</span>
+        <span class="icon">👰</span>
+      </div>
+
+      <p class="eyebrow">We're getting married</p>
+      <h1 class="names">
+        <span class="name">Văn Tài</span>
+        <span class="amp">&amp;</span>
+        <span class="name">Thu Hương</span>
+      </h1>
+      <p class="subtitle">
+        Tình yêu của chúng con là lời cảm ơn gửi đến bậc sinh thành.<br />
+        Hôn lễ của chúng con là niềm vui được sẻ chia cùng người thân, bạn bè.
+      </p>
+      <div class="divider"><span></span><i>❖</i><span></span></div>
+    </section>
+
+    <section class="families reveal">
+      <div class="family-col">
+        <span class="family-label">Nhà Trai</span>
+        <p class="family-parents">Ông Nguyễn Văn Bình<br />Bà Trần Thị Lan</p>
+        <p class="family-child">Văn Tài <span class="role">(con trai)</span></p>
+      </div>
+      <div class="family-divider">🌿</div>
+      <div class="family-col">
+        <span class="family-label">Nhà Gái</span>
+        <p class="family-parents">Ông Lê Văn Hòa<br />Bà Phạm Thị Mai</p>
+        <p class="family-child">Thu Hương <span class="role">(con gái)</span></p>
+      </div>
+    </section>
+
+    <div class="divider reveal"><span></span><i>❖</i><span></span></div>
+
+    <section class="events reveal">
+      <div class="event-item">
+        <span class="event-icon">⛪</span>
+        <h3>Lễ Thành Hôn</h3>
+        <p class="event-time">Chủ Nhật, 20.12.2026 — 09:00 sáng</p>
+        <p class="event-place">Tư gia nhà trai<br />12 Đường Hoa Mai, P. Tân Phú, Quận 9, TP.HCM</p>
+      </div>
+      <div class="event-item">
+        <span class="event-icon">🥂</span>
+        <h3>Tiệc Chiêu Đãi</h3>
+        <p class="event-time">Chủ Nhật, 20.12.2026 — 18:00 tối</p>
+        <p class="event-place">Trung tâm Hội nghị Hoa Sen<br />123 Đường Hạnh Phúc, Q.1, TP.HCM</p>
+      </div>
+    </section>
+
+    <a class="map-link reveal" href="https://maps.google.com/?q=123+Đường+Hạnh+Phúc,+Quận+1,+TP.HCM" target="_blank" rel="noopener">
+      📍 Xem đường đi trên Google Maps
+    </a>
+
+    <div class="divider reveal"><span></span><i>❖</i><span></span></div>
+
+    <section class="countdown reveal" aria-label="Đếm ngược đến ngày cưới">
+      <div class="count-box"><span id="cd-days">00</span><label>Ngày</label></div>
+      <div class="count-box"><span id="cd-hours">00</span><label>Giờ</label></div>
+      <div class="count-box"><span id="cd-mins">00</span><label>Phút</label></div>
+      <div class="count-box"><span id="cd-secs">00</span><label>Giây</label></div>
+    </section>
+
+    <div class="divider reveal"><span></span><i>❖</i><span></span></div>
+
+    <section class="wishes-section reveal">
+      <h2>💌 Gửi lời chúc</h2>
+      <p class="wishes-note">Mỗi khách chỉ gửi được tối đa 2 lời chúc nhé 💛</p>
+
+      <form id="wish-form" class="wish-form">
+        <input
+          type="text"
+          id="wish-name"
+          name="name"
+          placeholder="Tên của bạn"
+          maxlength="100"
+          required
+        />
+        <textarea
+          id="wish-message"
+          name="message"
+          placeholder="Viết lời chúc gửi đến cô dâu & chú rể..."
+          maxlength="500"
+          rows="3"
+          required
+        ></textarea>
+        <button type="submit" id="wish-submit">Gửi lời chúc 💐</button>
+        <p id="wish-feedback" class="wish-feedback" role="status"></p>
+      </form>
+
+      <ul id="wish-list" class="wish-list" aria-label="Danh sách lời chúc"></ul>
+    </section>
+
+    <footer class="footer reveal">
+      <p class="footer-icon">🤍</p>
+      <p>Sự hiện diện của bạn là niềm hạnh phúc lớn lao của gia đình chúng tôi</p>
+      <p class="signature">Văn Tài &amp; Thu Hương</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
