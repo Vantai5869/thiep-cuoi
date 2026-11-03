@@ -1,4 +1,6 @@
-const { kv } = require('@vercel/kv');
+const { neon } = require('@neondatabase/serverless');
+
+const sql = neon(process.env.DATABASE_URL);
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({
@@ -11,8 +13,11 @@ function escapeHtml(str) {
 }
 
 module.exports = async function handler(req, res) {
-  const raw = await kv.lrange('wishes', 0, -1);
-  const wishes = raw.map((w) => (typeof w === 'string' ? JSON.parse(w) : w));
+  const wishes = await sql`
+    SELECT name, message, ip, user_agent AS "userAgent", created_at AS "createdAt"
+    FROM wishes
+    ORDER BY created_at DESC
+  `;
 
   const rows = wishes
     .map(

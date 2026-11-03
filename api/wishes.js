@@ -1,6 +1,20 @@
-const { kv } = require('@vercel/kv');
+const { neon } = require('@neondatabase/serverless');
 
+const sql = neon(process.env.DATABASE_URL);
 const MAX_WISHES_PER_IP = 2;
+
+async function ensureTable() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS wishes (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      message TEXT NOT NULL,
+      ip TEXT NOT NULL,
+      user_agent TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+}
 
 function getClientIp(req) {
   const xff = req.headers['x-forwarded-for'];
@@ -9,13 +23,15 @@ function getClientIp(req) {
 }
 
 module.exports = async function handler(req, res) {
+  await ensureTable();
+
   if (req.method === 'GET') {
-    const raw = await kv.lrange('wishes', 0, -1);
-    const wishes = raw.map((w) => {
-      const { name, message, createdAt } = typeof w === 'string' ? JSON.parse(w) : w;
-      return { name, message, createdAt };
-    });
-    return res.status(200).json(wishes);
+    const rows = await sql`
+      SELECT name, message, created_at AS "createdAt"
+      FROM wishes
+      ORDER BY created_at DESC
+    `;
+    return res.status(200).json(rows);
   }
 
   if (req.method === 'POST') {
@@ -31,28 +47,26 @@ module.exports = async function handler(req, res) {
     const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'] || 'unknown';
 
-    const countFromIp = Number(await kv.hget('ip_counts', ip)) || 0;
-    if (countFromIp >= MAX_WISHES_PER_IP) {
+    const [{ count }] = await sql`SELECT COUNT(*) FROM wishes WHERE ip = ${ip}`;
+    if (Number(count) >= MAX_WISHES_PER_IP) {
       return res.status(429).json({
         error: `Bạn đã gửi tối đa ${MAX_WISHES_PER_IP} lời chúc rồi. Cảm ơn bạn rất nhiều! 💛`,
       });
     }
 
-    const wish = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-      name: name.trim(),
-      message: message.trim(),
-      ip,
-      userAgent,
-      createdAt: new Date().toISOString(),
-    };
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const trimmedName = name.trim();
+    const trimmedMessage = message.trim();
 
-    await kv.lpush('wishes', JSON.stringify(wish));
-    await kv.hincrby('ip_counts', ip, 1);
+    const [wish] = await sql`
+      INSERT INTO wishes (id, name, message, ip, user_agent)
+      VALUES (${id}, ${trimmedName}, ${trimmedMessage}, ${ip}, ${userAgent})
+      RETURNING name, message, created_at AS "createdAt"
+    `;
 
     return res.status(201).json({
       message: 'Cảm ơn bạn đã gửi lời chúc! 💌',
-      wish: { name: wish.name, message: wish.message, createdAt: wish.createdAt },
+      wish,
     });
   }
 
